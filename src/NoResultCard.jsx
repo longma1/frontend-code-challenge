@@ -1,7 +1,7 @@
 import React from 'react';
 
 const card = () =>
-    <li key="PokemonNotFound">
+    <li>
         <img src="https://cyndiquil721.files.wordpress.com/2014/02/missingno.png" alt="" />
         <div className="info">
             <h1 className="no-results">

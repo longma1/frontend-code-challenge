@@ -4,11 +4,11 @@ const PokemonCard = (props) => {
     let types = [];
 
     for (let i = 0; i < props.pokemon.Types.length; i++) {
-        types.push(<span className={"type " + props.pokemon.Types[i].toLowerCase()}> {props.pokemon.Types[i]}</span >);
+        types.push(<span key={props.pokemon.Number + props.pokemon.Types[i]} className={"type " + props.pokemon.Types[i].toLowerCase()}> {props.pokemon.Types[i]}</span >);
     }
 
     return (
-        <li key={props.pokemon.Number}>
+        <li>
             <img src={props.pokemon.img} alt="" />
             <div className="info">
                 <h1>{props.pokemon.Name}</h1>

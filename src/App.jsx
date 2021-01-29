@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import SearchApp from './SearchApp';
 
@@ -7,12 +7,15 @@ const URL_PATH = "https://gist.githubusercontent.com/bar0191/fae6084225b608f25e9
 const App = () => {
     const [pokedex, SetPokedex] = useState([])
 
-    fetch(URL_PATH)
-        .then((response) => {
-            response.json().then(data => {
-                SetPokedex(data);
-            });
-        });
+    useEffect(() => {
+        fetch(URL_PATH)
+            .then((response) => {
+                response.json().then(data => {
+                    SetPokedex(data);
+                });
+            })
+    }, []
+    );
 
     return <SearchApp pokedex={pokedex} loading={pokedex.length === 0} />;
 }

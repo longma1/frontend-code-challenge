@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import NoResultCard from './NoResultCard'
 import PokemonCard from './PokemonCard'
 
@@ -7,10 +7,12 @@ import './App.css';
 var MAX_CARDS_DISPLAYED = 4;
 
 function SearchApp(props) {
-    const [searchResults, setSearchResults] = useState(props.pokedex);
+    const searchResults = useRef(props.pokedex);
+
+    const [displayedResults, setDisplayedResults] = useState(searchResults.current.slice(0, MAX_CARDS_DISPLAYED));
     const [orderByCP, setOrderByCP] = useState(false);
 
-    var displayedResults = searchResults.slice(0, MAX_CARDS_DISPLAYED);
+
 
     const searchPokemon = (search) => {
         let result = new Set();
@@ -19,7 +21,7 @@ function SearchApp(props) {
         })
 
         let typeSearch = props.pokedex.filter((pokemon) => {
-            return pokemon.Types.includes(search);
+            return pokemon.Types.filter((type) => type.includes(search)).length > 0;
         })
 
         for (let i = 0; i < nameSearch.length; i++) {
@@ -29,10 +31,22 @@ function SearchApp(props) {
             result.add(typeSearch[i]);
         }
 
-        setSearchResults(Array.from(result));
-        displayedResults = searchResults.slice(0, MAX_CARDS_DISPLAYED);
+        searchResults.current = Array.from(result);
+
+        updateDisplay();
 
         return null;
+    }
+
+    const updateDisplay = () => {
+        if (!orderByCP) {
+            setDisplayedResults(searchResults.current.slice(0, MAX_CARDS_DISPLAYED));
+        }
+        else {
+            console.log(orderByCP);
+            let orderedResults = searchResults.current.sort((a, b) => { return (a.MaxCP < b.MaxCP) });
+            setDisplayedResults(orderedResults.slice(0, MAX_CARDS_DISPLAYED));
+        }
     }
 
 
@@ -43,8 +57,13 @@ function SearchApp(props) {
 
     const handleChangeOrderBy = (e) => {
         e.preventDefault();
+        setOrderByCP(e.target.value);
+        updateDisplay();
     }
 
+    if (props.loading) {
+        return <div className="loader"></div>
+    }
     return (
         <>
             <label htmlFor="maxCP" className="max-cp">
@@ -54,9 +73,10 @@ function SearchApp(props) {
                 </small>
             </label>
             <input type="text" className="input" placeholder="Pokemon or type" onChange={handleChangeSearch} />
-            {props.loading ? <div className="loader"></div> : <></>}
             <ul className="suggestions">
-                {displayedResults.length === 0 ? <NoResultCard /> : displayedResults.map((pokemon) => { return <PokemonCard pokemon={pokemon} /> })}
+                {displayedResults.length === 0 ? <NoResultCard key="NoResultCard" /> : displayedResults.map((pokemon) => {
+                    return <PokemonCard key={pokemon.Number} pokemon={pokemon} />
+                })}
             </ul>
         </>);
 }
